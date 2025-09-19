@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Tarefas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .add-form {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            font-size: 14px;
+            padding: 8px 15px;
+            margin-right: 10px;
+        }
+
+        .tasks-list {
+            margin-top: 30px;
+        }
+
+        .task-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .task-description {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .edit-form.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+            padding: 40px;
+            font-size: 18px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .task-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Minhas Tarefas</h1>
+
+        <!-- Alertas -->
+        <div id="alert-container"></div>
+
+        <!-- Formulário para adicionar tarefa -->
+        <div class="add-form">
+            <h3 style="margin-bottom: 15px; color: #4a5568;">✨ Adicionar Nova Tarefa</h3>
+            <form id="add-task-form">
+                <div class="form-group">
+                    <label for="title">Título *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" name="description" placeholder="Descreva sua tarefa..."></textarea>
+                </div>
+                                
+                <button type="submit" class="btn">Adicionar Tarefa</button>
+            </form>
+        </div>
+
+        <!-- Lista de tarefas -->
+        <div class="tasks-list">
+            <h3 style="margin-bottom: 20px; color: #4a5568;">Suas Tarefas</h3>
+            <div id="tasks-container">
+                <div class="empty-state">
+                    Nenhuma tarefa ainda.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de banco de dados local
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let nextId = Math.max(...tasks.map(t => t.id), 0) + 1;
+
+        // Elementos DOM
+        const addForm = document.getElementById('add-task-form');
+        const tasksContainer = document.getElementById('tasks-container');
+        const alertContainer = document.getElementById('alert-container');
+
+        // Event listeners
+        addForm.addEventListener('submit', addTask);
+
+        // Carregar tarefas na inicialização
+        renderTasks();
+
+        function addTask(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(addForm);
+            const title = formData.get('title').trim();
+            const description = formData.get('description').trim();
+
+            if (!title) {
+                showAlert('O título é obrigatório!', 'error');
+                return;
+            }
+
+            const newTask = {
+                id: nextId++,
+                title,
+                description,
+                createdAt: new Date().toISOString()
+            };
+
+            tasks.unshift(newTask);
+            saveTasks();
+            renderTasks();
+            addForm.reset();
+            showAlert('Tarefa adicionada com sucesso!', 'success');
+        }
+
+        function editTask(id) {
+            const editForm = document.getElementById(`edit-form-${id}`);
+            editForm.classList.toggle('active');
+        }
+
+        function updateTask(id) {
+            const form = document.getElementById(`edit-form-${id}`);
+            const formData = new FormData(form);
+            const title = formData.get('title').trim();
+            const description = formData.get('description').trim();
+
+            if (!title) {
+                showAlert('O título é obrigatório!', 'error');
+                return;
+            }
+
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex !== -1) {
+                tasks[taskIndex] = {
+                    ...tasks[taskIndex],
+                    title,
+                    description,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                saveTasks();
+                renderTasks();
+                showAlert('Tarefa atualizada com sucesso!', 'success');
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+                showAlert('Tarefa excluída com sucesso!', 'success');
+            }
+        }
+
+        function renderTasks() {
+            if (tasks.length === 0) {
+                tasksContainer.innerHTML = `
+                    <div class="empty-state">
+                        Nenhuma tarefa ainda.
+                    </div>
+                `;
+                return;
+            }
+
+            tasksContainer.innerHTML = tasks.map(task => `
+                <div class="task-item">
+                    <div class="task-header">
+                        <div class="task-title">
+                            ${task.title}
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-edit" onclick="editTask(${task.id})">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteTask(${task.id})">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                    
+                    <div class="edit-form" id="edit-form-${task.id}">
+                        <form onsubmit="event.preventDefault(); updateTask(${task.id});">
+                            <div class="form-group">
+                                <label>Título *</label>
+                                <input type="text" name="title" value="${task.title}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição</label>
+                                <textarea name="description">${task.description || ''}</textarea>
+                            </div>
+                            <div class="form-group">
+                            </div>
+                            <button type="submit" class="btn">Salvar</button>
+                            <button type="button" class="btn btn-danger" onclick="editTask(${task.id})">❌ Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAlert(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const alertHTML = `
+                <div class="alert ${alertClass}">
+                    ${message}
+                </div>
+            `;
+            
+            alertContainer.innerHTML = alertHTML;
+            
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 3000);
+        }
+
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+    </script>
+</body>
+</html>
